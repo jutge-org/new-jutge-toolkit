@@ -189,4 +189,11 @@ Run `jtk doctor` to check which dependencies are installed on your system.
 
 ## License
 
-Copyright © Jutge.org. All rights reserved.
+Apache License 2.0
+
+## Credits
+
+- [Jordi Petit](https://github.com/jordi-petit)
+- [Pau Fernández](https://github.com/pauek)
+
+By Universitat Politècnica de Catalunya - BarcelonaTech (UPC), 2026.
