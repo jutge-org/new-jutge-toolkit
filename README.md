@@ -7,11 +7,19 @@ A powerful command-line toolkit for creating and managing programming problems o
 - 📝 Create new problems from scratch or using templates
 - 🤖 Generate problems using JutgeAI
 - 🔧 Compile and test solutions in multiple programming languages
-- 📄 Generate PDF statements and other formats automatically
+- 📄 Generate statements in PDF, HTML, Markdown and text formats automatically
 - ✅ Verify solutions against test cases
 - 🎬 Stage problems matching Jutge.org specifications
 - ☁️ Upload and update problems directly to Jutge.org
 - ✨ Beautiful terminal interface with color output and help
+
+## Documentation
+
+- **[Getting Started Guide](docs/getting-started-guide.md)** - Complete guide to using the toolkit
+- **[Problem Anatomy](docs/problem-anatomy.md)** - Understanding problem structure and files
+- **[Quiz Anatomy](docs/quiz-anatomy.md)** - Understanding quiz problems and question types
+- **[JutgeAI Features](docs/jutge-ai.md)** - Using AI to generate content
+- **[Command Reference](docs/reference.md)** - Complete reference of all commands and options
 
 ## Installation
 
@@ -104,22 +112,6 @@ For a complete walkthrough, see the [Getting Started Guide](docs/getting-started
 
         In order to submit a candidate solution, you need to have the problem uploaded to Jutge.org. This solution will be judged by Jutge.org and you will get its verdict.
 
-## Documentation
-
-### Essential Guides
-
-- **[Getting Started Guide](docs/getting-started-guide.md)** - Complete guide to using the toolkit
-- **[Problem Anatomy](docs/problem-anatomy.md)** - Understanding problem structure and files
-- **[Quiz Anatomy](docs/quiz-anatomy.md)** - Understanding quiz problems and question types
-- **[JutgeAI Features](docs/jutge-ai.md)** - Using AI to generate content
-- **[Command Reference](docs/reference.md)** - Complete reference of all commands and options
-
-### Installation Guides
-
-- **[Linux Installation](docs/install-linux.md)** - Installation steps for Linux
-- **[macOS Installation](docs/install-macos.md)** - Installation steps for macOS
-- **[Windows Installation](docs/install-windows.md)** - Installation steps for Windows
-
 ## Common Commands
 
 ```bash
@@ -196,4 +188,4 @@ Apache License 2.0
 - [Jordi Petit](https://github.com/jordi-petit)
 - [Pau Fernández](https://github.com/pauek)
 
-By Universitat Politècnica de Catalunya - BarcelonaTech (UPC), 2026.
+© Universitat Politècnica de Catalunya - BarcelonaTech (UPC), 2026.
