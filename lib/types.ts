@@ -38,7 +38,9 @@ export const Handler = z.object({
     handler: z.enum(['std', 'graphic', 'quiz', 'circuits', 'game']).default('std'),
     solution: z.string().default('C++'),
     source_modifier: z.enum(['none', 'no_main', 'structs']).default('none'),
-    compilers: z.string().optional(),
+    compilers: z.string()
+        .regex(/^\w+$/, { message: 'Despite its name, "compilers" must be a single word. It is not a list of compilers. See the documentation.' })
+        .optional(),
 
     func_name: z.string().optional()
         .meta({ description: 'Name of the function requested in case the problem only asks for a function (use with source_modifier: "no_main")' }),
