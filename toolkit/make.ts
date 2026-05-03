@@ -1,7 +1,7 @@
 import { Command } from '@commander-js/extra-typings'
 import chokidar from 'chokidar'
 import { basename, dirname, join, resolve } from 'path'
-import { findRealDirectories } from '../lib/helpers'
+import { findRealDirectories, noProblemDirsMessage } from '../lib/helpers'
 import { lintDirectories } from '../lib/lint'
 import { printLintResults } from './lint'
 import { newMaker, type Maker } from '../lib/maker'
@@ -115,7 +115,7 @@ export const makeCmd = new Command('make')
         await tui.section('', async () => {
             await nothing()
             if (realDirectories.length === 0) {
-                tui.warning('No problem directories found')
+                tui.warning(noProblemDirsMessage)
             }
             for (const directory of realDirectories) {
                 if (errors[directory]) {
@@ -365,7 +365,7 @@ async function runWatch(maker: Maker): Promise<void> {
                     try {
                         const results = await lintDirectories([directory])
                         if (results.length === 0) {
-                            tui.warning('No problem directories found (looked for handler.yml in the given path(s)).')
+                            tui.warning(noProblemDirsMessage)
                         } else {
                             await printLintResults(results, [directory])
                         }

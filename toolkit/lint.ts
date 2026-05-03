@@ -1,6 +1,7 @@
 import { Command } from '@commander-js/extra-typings'
 import chalk from 'chalk'
 import { resolve } from 'path'
+import { noProblemDirsMessage } from '../lib/helpers'
 import { lintDirectories, type LintIssue, type LintPassed, type LintResult } from '../lib/lint'
 import tui from '../lib/tui'
 
@@ -66,7 +67,7 @@ export const lintCmd = new Command('lint')
 
         await tui.section(`Linting ${tui.hyperlink(resolve(directory))}`, async () => {
             const results = await lintDirectories([directory], { verbose })
-            if (results.length === 0) throw new Error('No problem directories found (looked for handler.yml in the given path(s)).')
+            if (results.length === 0) throw new Error(noProblemDirsMessage)
             const { hasError } = printLintResults(results, [directory], { verbose })
             if (hasError) {
                 process.exitCode = 1

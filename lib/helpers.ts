@@ -49,6 +49,10 @@ export async function findRealDirectories(directories: string[]): Promise<string
     return realDirectories.map((d) => normalize(d)).sort()
 }
 
+/** Shown when paths passed to the CLI do not resolve to any directory containing handler.yml (see findRealDirectories). */
+export const noProblemDirsMessage =
+    'No problem directories found: did not find handler.yml under the path(s) you used. A problem folder must contain handler.yml at its root, or use <language>/handler.yml under each language subfolder.'
+
 export function listify(items: (string | undefined)[]): string {
     if (items.length === 0) {
         return '<none>'
