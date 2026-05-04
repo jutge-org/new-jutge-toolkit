@@ -54,7 +54,7 @@ export class MakePRO2_Compiler extends Compiler {
         // Copy `public`, `private`, and `solution` C++ files over
         // NOTE(pauek): We _have_ to copy files in "public", then "private", then "solution"
         for (const dir of ['public', 'private', 'solution']) {
-            const ccfiles = await Array.fromAsync(glob(`${dir}/*.{cc,hh}`, { cwd: directory }))
+            const ccfiles = await Array.fromAsync(glob(`${dir}/*.{cc,hh,cpp,hpp,tpp}`, { cwd: directory }))
             for (const file of ccfiles) {
                 const dest = join(dirPath, basename(file))
                 await cp(join(directory, file), dest)
