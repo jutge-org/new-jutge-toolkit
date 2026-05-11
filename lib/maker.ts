@@ -422,7 +422,7 @@ export class Maker {
             return '{' + value + '}'
         })
 
-        const root = Handlebars.compile(rootTemplate)({
+        const root = Handlebars.compile(rootTemplate, { noEscape: true })({
             language,
             jutgeLanguage: `jutge.${language}`,
             id: `${this.problem_nm}\\_${language}`,
@@ -579,7 +579,7 @@ export class Maker {
             return '{' + value + '}'
         })
 
-        const root = Handlebars.compile(rootTemplate)({
+        const root = Handlebars.compile(rootTemplate, { noEscape: true })({
             language,
             jutgeLanguage: `jutge.${language}`,
             id: `${this.problem_nm}\\_${language}`,
