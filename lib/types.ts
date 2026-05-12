@@ -39,7 +39,7 @@ export const Handler = z.object({
     solution: z.string().default('C++'),
     source_modifier: z.enum(['none', 'no_main', 'structs']).default('none'),
     compilers: z.string()
-        .regex(/^\w+$/, { message: 'Despite its name, "compilers" must be a single word. It is not a list of compilers. See the documentation.' })
+        .regex(/^\S*$/, { message: 'Despite its name, "compilers" must be a single word. It is not a list of compilers. See the documentation.' })
         .optional(),
 
     func_name: z.string().optional()
