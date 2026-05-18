@@ -23,7 +23,7 @@ export const aboutCmd = new Command('about')
         }
         tui.print('')
         tui.print('Documentation:')
-        tui.url('https://github.com/jutge-org/new-jutge-toolkit/tree/main/docs')
+        tui.url('https://github.com/jutge-org/jutge-toolkit/tree/main/docs')
     })
 
 function showPerson(person: string | { name: string; email?: string; url?: string }) {

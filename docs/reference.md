@@ -31,7 +31,7 @@ Global options on the main program:
 - **`-V`, `--version`** — Print the toolkit version and exit.
 - **`-h`, `--help`** — Show help.
 
-More documentation: [toolkit docs on GitHub](https://github.com/jutge-org/new-jutge-toolkit/tree/main/docs).
+More documentation: [toolkit docs on GitHub](https://github.com/jutge-org/jutge-toolkit/tree/main/docs).
 
 ---
 

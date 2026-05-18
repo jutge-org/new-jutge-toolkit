@@ -22,7 +22,7 @@ program.name('code-metrics')
 program.version(packageJson.version)
 program.description('Provides measures extracted from a static inspection of the submitted code.')
 program.helpCommand('help [command]', 'Display help for command') // To get the message with uppercase :-)
-program.addHelpText('after', '\nMore documentation:\n  https://github.com/jutge-org/new-jutge-toolkit/tree/main/docs')
+program.addHelpText('after', '\nMore documentation:\n  https://github.com/jutge-org/jutge-toolkit/tree/main/docs')
 
 program
     .argument('program', 'Program file to analyze')
