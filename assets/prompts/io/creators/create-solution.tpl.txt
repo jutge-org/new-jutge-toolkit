@@ -10,6 +10,8 @@ Take these instructions into account:
 
 - The code must be well written and easy to understand to novices. It cannot use advanced constructs.
 
+- Never overoptimize.
+
 - The code does not have to check the preconditions stated in the problem statement.
 
 - Do not use any non-standard libraries.

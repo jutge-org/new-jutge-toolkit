@@ -4,6 +4,10 @@
 
 - Use type hints for function definitions. Do not use old-style type hints such as `List[int]` with `List` imported from `typing`, but use modern syntax such as `list[int]`.
 
+- Use `type` keyword or `TypeAlias` with a suitable semantic name rather than repeating raw complex types. For instance, use `type Temperatures = list[float]` instead of `list[float]`.
+
+- Avoid using `break`, `continue` and exceptions.
+
 - Ensure that the generated Python3 code follows best practices, including proper indentation, use of functions, use of docstrings, and adherence to PEP 8 style guidelines.
 
 # Very important
@@ -40,5 +44,7 @@ for x in tokens(int):  # iterates over all integers in the input
     s += x
 print(s) # prints the sum of all the integers in the input
 ```
+
+Priorize `tokens(type)` over `scan(type)` when possible.
 
 In yogi functions, `type` can be `int`, `float`, or `str`.

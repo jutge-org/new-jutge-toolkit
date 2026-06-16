@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-03-18T10:02:06.231Z
+ * This file has been automatically generated at 2026-06-16T06:34:59.852Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -314,6 +314,7 @@ export type NewSubmissionIn = {
     problem_id: string
     compiler_id: string
     annotation: string
+    extraSubmissionInfo: any
 }
 
 export type NewSubmissionOut = {
@@ -365,14 +366,40 @@ export type SubmissionSchema = {
 
 export type GetGameResultOut = {
     games: MatchSchema[]
-    problem: ProblemSchema
-    submission: SubmissionSchema
 }
 
 export type GetGameOutputIn = {
     problem_id: string
     submission_id: string
     game_id: number
+}
+
+export type CodeMetrics = {
+    comment_ratio: number
+    cyclomatic_complexity: number
+    fanout_external: number
+    fanout_internal: number
+    halstead_bugprop: number
+    halstead_difficulty: number
+    halstead_effort: number
+    halstead_timerequired: number
+    halstead_volume: number
+    loc: number
+    maintainability_index: number
+    operands_sum: number
+    operands_uniq: number
+    operators_sum: number
+    operators_uniq: number
+    pylint: number
+    tiobe: number
+    tiobe_compiler: number
+    tiobe_complexity: number
+    tiobe_coverage: number
+    tiobe_duplication: number
+    tiobe_fanout: number
+    tiobe_functional: number
+    tiobe_security: number
+    tiobe_standard: number
 }
 
 export type PublicProfile = {
@@ -508,6 +535,7 @@ export type Document = {
     document_nm: string
     title: string
     description: string
+    type: string
     created_at: string | string | string | number
     updated_at: string | string | string | number
 }
@@ -812,6 +840,12 @@ export type SharingSettings = {
     shared_solutions: boolean
 }
 
+export type ProblemAlerts = {
+    problem_nm: string
+    se_count: number
+    ie_count: number
+}
+
 export type ProblemAnonymousSubmission = {
     time: string
     anonymous_user_id: string
@@ -825,6 +859,13 @@ export type ShareWithInp = {
     problem_nm: string
     emails: string[]
     text: string
+}
+
+export type ProblemPopularityBucketEntry = {
+    log2_bucket: number
+    bucket_min: number
+    bucket_max: number
+    problem_count: number
 }
 
 export type SubmissionQuery = {
@@ -869,32 +910,6 @@ export type CreateImageInput = {
     prompt: string
     size: string
 }
-
-export type SubmitPlayerInput = {
-    problem_id: string
-    annotation: string
-    source_code: string
-    callback_url: string
-}
-
-export type SubmitPlayerOutput = NewSubmissionOut
-
-export type SubmitMatchInput = {
-    problem_id: string
-    annotation: string
-    source_codes: string[]
-    callback_url: string
-}
-
-export type SubmitMatchOutput = NewSubmissionOut
-
-export type GetGameResultOutput = {
-    todo: string
-}
-
-export type GetMatchSubmissionInput = GetGameResultIn
-
-export type GetMatchSubmissionOutput = GetGameResultOutput
 
 export type InstructorEntry = {
     username: string
@@ -1084,6 +1099,7 @@ export type SomeType = {
 
 export interface Meta {
     readonly token: string
+    readonly user_uid: string
 }
 
 export interface Download {
@@ -1159,7 +1175,9 @@ export class JutgeApiClient {
     JUTGE_API_URL = process.env.JUTGE_API_URL || "https://api.jutge.org/api"
 
     /** Headers to include in the API requests */
-    headers: Record<string, string> = {}
+    headers: Record<string, string> = {
+        ...(process.env.JUTGE_DOMAIN ? { "x-forwarded-host": process.env.JUTGE_DOMAIN } : {}),
+    }
 
     /** Meta information */
     meta: Meta | null = null
@@ -1259,7 +1277,7 @@ export class JutgeApiClient {
     async login({ email, password }: { email: string; password: string }): Promise<CredentialsOut> {
         const [credentials, _] = await this.execute("auth.login", { email, password })
         if (credentials.error) throw new UnauthorizedError(credentials.error)
-        this.meta = { token: credentials.token }
+        this.meta = { token: credentials.token, user_uid: credentials.user_uid }
         return credentials
     }
 
@@ -1277,7 +1295,7 @@ export class JutgeApiClient {
     }): Promise<CredentialsOut> {
         const [credentials, _] = await this.execute("auth.loginExam", { email, password, exam, exam_password })
         if (credentials.error) throw new UnauthorizedError(credentials.error)
-        this.meta = { token: credentials.token }
+        this.meta = { token: credentials.token, user_uid: credentials.user_uid }
         return credentials
     }
 
@@ -1485,6 +1503,18 @@ class Module_auth {
      */
     async loginExam(data: ExamCredentialsIn): Promise<CredentialsOut> {
         const [output, ofiles] = await this.root.execute("auth.loginExam", data)
+        return output
+    }
+
+    /**
+     * Get list of ready exams for a user, given their credentials.
+     *
+     * 🔐 Authentication: any
+     * No warnings
+     * Validates user credentials and returns the list of ready exams. Does not create a session or return a token.
+     */
+    async getReadyExams(data: CredentialsIn): Promise<ReadyExam[]> {
+        const [output, ofiles] = await this.root.execute("auth.getReadyExams", data)
         return output
     }
 
@@ -2020,6 +2050,18 @@ class Module_problems {
         const [output, ofiles] = await this.root.execute("problems.fullTextSearch", data)
         return output
     }
+
+    /**
+     * Get solutions for a problem.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     * The keys are the proglangs and the values are the solutions in base64. Pemission is granted to admin, ownerof the problem and instructor when shared solutions are enabled.
+     */
+    async getSolutions(problem_id: string): Promise<Record<string, string>> {
+        const [output, ofiles] = await this.root.execute("problems.getSolutions", problem_id)
+        return output
+    }
 }
 
 /**
@@ -2382,11 +2424,23 @@ class Module_student_submissions {
     }
 
     /**
+     * Get all submissions for a list of abstract problems.
+     *
+     * 🔐 Authentication: user
+     * No warnings
+     * Flat array of submissions from newer to older.
+     */
+    async getForAbstractProblems(problem_nms: string): Promise<Submission[]> {
+        const [output, ofiles] = await this.root.execute("student.submissions.getForAbstractProblems", problem_nms)
+        return output
+    }
+
+    /**
      * Get all submissions.
      *
      * 🔐 Authentication: user
      * No warnings
-     * Flat array of submissions in chronological order.
+     * Flat array of submissions from newer to older.
      */
     async getAll(): Promise<Submission[]> {
         const [output, ofiles] = await this.root.execute("student.submissions.getAll", null)
@@ -2442,13 +2496,13 @@ class Module_student_submissions {
     }
 
     /**
-     * Get code metrics for a submission as JSON.
+     * Get code metrics for a submission.
      *
      * 🔐 Authentication: user
-     * ❌ Warning: TODO: add more documentation
-     * See https://github.com/jutge-org/jutge-code-metrics for details.
+     * No warnings
+     *
      */
-    async getCodeMetrics(data: GetGameResultIn): Promise<any> {
+    async getCodeMetrics(data: GetGameResultIn): Promise<CodeMetrics | null> {
         const [output, ofiles] = await this.root.execute("student.submissions.getCodeMetrics", data)
         return output
     }
@@ -2655,7 +2709,7 @@ class Module_student_exam {
     /**
      * Get list of ready exams.
      *
-     * 🔐 Authentication: any
+     * 🔐 Authentication: user
      * No warnings
      * An exam is ready if the current time is between its expected start time minus two days and its expected end time plus two days. Exams are sorted by their distance to the current time and by title order in case of ties.
      */
@@ -2858,7 +2912,7 @@ class Module_instructor_documents {
      *
      * 🔐 Authentication: instructor
      * No warnings
-     * The PDF file is not included in the response.
+     * The file content is not included in the response.
      */
     async get(document_nm: string): Promise<Document> {
         const [output, ofiles] = await this.root.execute("instructor.documents.get", document_nm)
@@ -2874,6 +2928,18 @@ class Module_instructor_documents {
      */
     async getPdf(document_nm: string): Promise<Download> {
         const [output, ofiles] = await this.root.execute("instructor.documents.getPdf", document_nm)
+        return ofiles[0]
+    }
+
+    /**
+     * Get ZIP of a document.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     *
+     */
+    async getZip(document_nm: string): Promise<Download> {
+        const [output, ofiles] = await this.root.execute("instructor.documents.getZip", document_nm)
         return ofiles[0]
     }
 
@@ -3538,6 +3604,30 @@ class Module_instructor_problems {
     }
 
     /**
+     * Get alerts for one problem.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     *
+     */
+    async getAlerts(problem_nm: string): Promise<ProblemAlerts> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getAlerts", problem_nm)
+        return output
+    }
+
+    /**
+     * Get alerts for all problems.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     *
+     */
+    async getAllAlerts(): Promise<ProblemAlerts[]> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getAllAlerts", null)
+        return output
+    }
+
+    /**
      * Share a problem with users.
      *
      * 🔐 Authentication: instructor
@@ -3558,6 +3648,18 @@ class Module_instructor_problems {
      */
     async setDeprecation(data: Deprecation): Promise<void> {
         const [output, ofiles] = await this.root.execute("instructor.problems.setDeprecation", data)
+        return output
+    }
+
+    /**
+     * Get the popularity buckets for all problems.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     * The buckets are sorted by the number of problems in each bucket by total number of submissions. The data is refreshed every hour.
+     */
+    async getProblemPopularityBuckets(): Promise<ProblemPopularityBucketEntry[]> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getProblemPopularityBuckets", null)
         return output
     }
 
@@ -3827,18 +3929,6 @@ class Module_games {
     async getViewer(problem_id: string): Promise<Download> {
         const [output, ofiles] = await this.root.execute("games.getViewer", problem_id)
         return ofiles[0]
-    }
-
-    /**
-     * Submit a match for a game.
-     *
-     * 🔐 Authentication: competitions
-     * No warnings
-     *
-     */
-    async submitMatch(data: SubmitMatchInput): Promise<NewSubmissionOut> {
-        const [output, ofiles] = await this.root.execute("games.submitMatch", data)
-        return output
     }
 }
 
